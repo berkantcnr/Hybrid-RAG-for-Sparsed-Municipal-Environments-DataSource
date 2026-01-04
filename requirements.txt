@@ -1,24 +1,17 @@
-# --- LLM & RAG Core ---
-langchain
-langchain-community
-langchain-text-splitters
-langchain-core
-sentence-transformers
-chromadb
-transformers
-accelerate
-bitsandbytes
-torch
-
-# --- Database & Graph ---
-neo4j
-
-# --- Data Processing ---
-pypdf
-fpdf2
-requests
-beautifulsoup4
-
-# --- Environment & Utilities ---
-python-dotenv       
-ipykernel           
+langchain==1.2.0
+langchain-community==0.4.1
+langchain-text-splitters==1.1.0
+langchain-core==1.2.6
+sentence-transformers==5.2.0
+chromadb==1.4.0
+transformers==4.57.3
+accelerate==1.12.0
+bitsandbytes==0.49.0
+torch==2.9.0+cu126
+neo4j==6.0.3
+pypdf==6.5.0
+fpdf2==2.8.5
+requests==2.32.5
+beautifulsoup4==4.13.5
+python-dotenv==1.2.1
+ipykernel==6.17.1
