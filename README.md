@@ -1,88 +1,82 @@
-# Hybrid RAG for Sparse Municipal Environments 🏙️
+# Hybrid RAG for Sparse Municipal Environments
 
-**Master's Thesis Project** | *Friedrich-Alexander-Universität Erlangen-Nürnberg*
+**Master's Thesis Project** | *Friedrich-Alexander-Universität Erlangen-Nürnberg*  
 **Author:** Berkant Cinar
 
 ---
 
-## 📌 Abstract
-This research presents a **Hybrid Retrieval-Augmented Generation (RAG)** architecture designed to address the challenges of information retrieval in municipal domains characterized by sparse and unstructured data. By integrating a semantic vector search engine (**ChromaDB**) with a structured Knowledge Graph (**Neo4j**), the system enables context-aware question answering using Large Language Models (**Meta Llama 3.1**).
+## Overview
+
+A **Hybrid Retrieval-Augmented Generation (RAG)** system that combines semantic vector search (**ChromaDB**), structured Knowledge Graphs (**Neo4j**), and Large Language Models (**Meta Llama 3.1**) to answer questions about municipal data.
+
+The system uses a pre-built Knowledge Graph ontology (created during thesis) stored in Neo4j to provide structured context alongside unstructured PDF search results.
+
+### Architecture
+- **Stage 1-2**: Data ingestion and PDF generation from web sources
+- **Stage 3**: Vector database creation with semantic embeddings
+- **Stage 4**: Knowledge Graph serialization and embedding (from pre-built ontology)
+- **Stage 5**: Dual-channel retrieval (PDF + KG)
+- **Stage 6**: LLM-based response generation
 
 ---
 
-## ⚙️ System Architecture & Methodology
+## Running on Google Colab
 
-The project implementation is divided into four distinct phases:
+2. **Open the main notebook**:
+   - Use `Hybrid_RAG_System.ipynb` 
+   - Execute cells sequentially
 
-### 1. Data Acquisition and Preprocessing
-**Rationale:** In municipal administrative domains, data is mostly unstructured and sparsed across various web portals. To address this, a custom data pipeline was established.
-* **Source Corpus:** 14 primary institutional websites were targeted. A recursive web scraping algorithm traversed these domains, resulting in 53 processed URLs.
-* **Processing:** Data extraction was executed using **BeautifulSoup4**, followed by a rigorous cleaning phase to remove noise (cookies, social media widgets). The output was standardized into PDF documents for vector ingestion.
+3. **Configure credentials** (.env):
+   ```
+   HUGGINGFACEHUB_API_TOKEN=hf_your_token
+   NEO4J_URI=neo4j+s://your-instance
+   NEO4J_USERNAME=neo4j
+   NEO4J_PASSWORD=your_password
+   ```
 
-### 2. Knowledge Graph Construction (Ontology)
-**Rationale:** To capture the hierarchical and administrative relationships often lost in pure text, a structured Knowledge Graph was implemented.
-* **Ontology:** A custom ontology based on **CIDOC-CRM** was developed to map municipal entities (e.g., *Facilities, Groups, Events*).
-* **Implementation:** The structural data is stored in **Neo4j**, allowing for Cypher-based graph traversals that answer complex queries such as "Who owns this facility?" or "What acts does this department perform?".
-
-### 3. Hybrid Retrieval Engine
-**Rationale:** Standard RAG systems often fail to retrieve exact relational facts. This system employs a dual-retrieval strategy:
-* **Vector Branch (Unstructured):** Utilizes `sentence-transformers/paraphrase-multilingual-mpnet-base-v2` within **ChromaDB** to find semantic matches in PDF documents.
-* **Graph Branch (Structured):** Utilizes `all-MiniLM-L6-v2` to map user queries to graph entities, executing recursive Cypher queries to fetch relational context.
-* Results from both branches are normalized and concatenated to form a rich context window.
-
-### 4. Generative Response (LLM Integration)
-**Rationale:** To synthesize the retrieved information into coherent, natural language responses.
-* **Model:** **Meta Llama 3.1-8B-Instruct** (quantized via BitsAndBytes) is employed as the reasoning engine.
-* **Pipeline:** The model receives the context from the Hybrid Retrieval Engine and generates precise answers acting as a "Municipal Expert".
+4. **Run all cells** - the system automatically:
+   - Scrapes municipal websites
+   - Creates vector embeddings
+   - Embeds knowledge graph data
+   - Tests dual-channel retrieval
+   - Generates answers with source attribution
 
 ---
 
-## 📂 Repository Structure
+## Requirements
 
-| Directory | Description |
-| :--- | :--- |
-| `chroma_db/` | Persistent vector database containing municipal PDF embeddings. |
-| `data/` | Raw dataset (Cleaned PDFs scraped from municipal sources). |
-| `notebooks/` | Source code for the system. **(Main File: `Hybrid_RAG_System.ipynb`)** |
-| `ontology/` | RDF/XML files defining the semantic relationships. |
-| `assets/` | Supplementary files (fonts, images). |
-| `requirements.txt` | List of Python dependencies. |
+```
+langchain==1.2.0
+langchain-community==0.4.1
+langchain-text-splitters==1.1.0
+langchain-core==1.2.6
+sentence-transformers==5.2.0
+chromadb==1.4.0
+transformers==4.57.3
+accelerate==1.12.0
+bitsandbytes==0.49.0
+torch==2.9.0+cu126
+neo4j==6.0.3
+pypdf==6.5.0
+fpdf2==2.8.5
+requests==2.32.5
+beautifulsoup4==4.13.5
+python-dotenv==1.2.1
+ipykernel==6.17.1
+```
 
----
 
-## 🚀 Installation & Usage
-
-### Prerequisites
-* Python 3.10+
-* Neo4j Database (Local or AuraDB)
-* Hugging Face API Token (for Llama 3.1)
-
-### Setup Steps
-
-1.  **Clone the Repository:**
-    ```bash
-    git clone [https://github.com/berkantcnr/Hybrid-RAG-for-Sparsed-Municipal-Environments.git](https://github.com/berkantcnr/Hybrid-RAG-for-Sparsed-Municipal-Environments.git)
-    cd Hybrid-RAG-for-Sparsed-Municipal-Environments
-    ```
-
-2.  **Install Dependencies:**
-    ```bash
-    pip install -r requirements.txt
-    ```
-
-3.  **Configure Environment:**
-    Create a `.env` file in the root directory:
-    ```ini
-    HUGGINGFACEHUB_API_TOKEN=your_token
-    NEO4J_URI=neo4j+s://your-instance-url
-    NEO4J_USERNAME=neo4j
-    NEO4J_PASSWORD=your_password
-    ```
-
-4.  **Run the System:**
-    Open `notebooks/Hybrid_RAG_System.ipynb` in VS Code, select your Python kernel, and execute the cells.
 
 ---
 
-## 🎓 Acknowledgments
-This project was developed as part of the Master's Thesis at **Friedrich-Alexander-Universität Erlangen-Nürnberg**.
+## Citation
+
+```bibtex
+@thesis{cinar2024hybrid,
+  author={Cinar, Berkant},
+  title={Hybrid Retrieval-Augmented Generation for Sparse Municipal Environments},
+  school={Friedrich-Alexander-Universität Erlangen-Nürnberg},
+  year={2024},
+  type={Master's Thesis}
+}
+```
