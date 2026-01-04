@@ -9,7 +9,7 @@
 
 A **Hybrid Retrieval-Augmented Generation (RAG)** system that combines semantic vector search (**ChromaDB**), structured Knowledge Graphs (**Neo4j**), and Large Language Models (**Meta Llama 3.1**) to answer questions about municipal data.
 
-The system uses a pre-built Knowledge Graph ontology (created during thesis) stored in Neo4j to provide structured context alongside unstructured PDF search results.
+The system uses a pre-built Knowledge Graph ontology (created during thesis) stored in Neo4j to provide structured context alongside vector search results.
 
 ### Architecture
 - **Stage 1-2**: Data ingestion and PDF generation from web sources
@@ -24,7 +24,8 @@ The system uses a pre-built Knowledge Graph ontology (created during thesis) sto
 
 2. **Open the main notebook**:
    - Use `Hybrid_RAG_System.ipynb` 
-   - Execute cells sequentially
+   - Execute cells sequentially.
+   - Huggingface and Neo4j credentials needed to connect knowledge graph and downloading llm model. 
 
 3. **Configure credentials** (.env):
    ```
@@ -65,18 +66,16 @@ python-dotenv==1.2.1
 ipykernel==6.17.1
 ```
 
-
-
 ---
 
 ## Citation
 
 ```bibtex
-@thesis{cinar2024hybrid,
+@thesis{cinar2026hybrid,
   author={Cinar, Berkant},
   title={Hybrid Retrieval-Augmented Generation for Sparse Municipal Environments},
   school={Friedrich-Alexander-Universität Erlangen-Nürnberg},
-  year={2024},
+  year={2026},
   type={Master's Thesis}
 }
 ```
