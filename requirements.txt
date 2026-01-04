@@ -1,0 +1,24 @@
+# --- LLM & RAG Core ---
+langchain
+langchain-community
+langchain-text-splitters
+langchain-core
+sentence-transformers
+chromadb
+transformers
+accelerate
+bitsandbytes
+torch
+
+# --- Database & Graph ---
+neo4j
+
+# --- Data Processing ---
+pypdf
+fpdf2
+requests
+beautifulsoup4
+
+# --- Environment & Utilities ---
+python-dotenv       
+ipykernel           
