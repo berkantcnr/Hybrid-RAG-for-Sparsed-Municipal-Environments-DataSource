@@ -17,7 +17,7 @@ This repository provides a **Hybrid Retrieval-Augmented Generation (RAG)** syste
 
 - **Knowledge Graph (Ontology):**
   - Neo4j connection details are managed via the `.env` file.
-  - The ontology/graph itself is hosted externally on a Neo4j instance.
+  - The knowledge graph itself is hosted externally on a Neo4j instance.
 
 - **Assets:**
   - Fonts and other assets for PDF generation are in the `assets/` folder.
