@@ -22,17 +22,6 @@ This repository provides a **Hybrid Retrieval-Augmented Generation (RAG)** syste
 - **Assets:**
   - Fonts and other assets for PDF generation are in the `assets/` folder.
 
-## Workflow Overview
-
-1. **Data Collection & PDF Generation:**
-   - Municipal websites are scraped, cleaned, and converted to PDFs (`data/municipal_pdfs/`).
-
-2. **Vector DB & Embedding:**
-   - PDFs are embedded into ChromaDB (`chroma_db/`).
-   - The Knowledge Graph (Neo4j) is also embedded for hybrid retrieval.
-
-3. **Query & Answering:**
-   - User questions are answered by retrieving from both the vector DB and the KG, then generating a final answer with the LLM.
 
 ## Important Notes
 
