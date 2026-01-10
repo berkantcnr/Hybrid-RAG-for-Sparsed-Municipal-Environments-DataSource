@@ -10,12 +10,16 @@ This repository provides a **Hybrid Retrieval-Augmented Generation (RAG)** syste
 - **Data Folder:**
   - Raw and processed PDFs are stored in `data/municipal_pdfs/`.
   - (PDFs are generated after web scraping and cleaning.)
+    
+- **Municipal Ontology:**
+  - Ontology and SPARQL queries for evaluation are stored in `/ontology/` folder.
+  - (PDFs are generated after web scraping and cleaning.)
 
 - **Vector Database:**
   - ChromaDB persistent storage is in the `chroma_db/` directory.
   - (Both PDF and Knowledge Graph embeddings are stored here.)
 
-- **Knowledge Graph (Ontology):**
+- **Knowledge Graph:**
   - Neo4j connection details are managed via the `.env` file.
   - The knowledge graph itself is hosted externally on a Neo4j instance.
 
@@ -27,7 +31,7 @@ This repository provides a **Hybrid Retrieval-Augmented Generation (RAG)** syste
 
 - A `.env` file is required for credentials (Huggingface and Neo4j access).
 - All paths are set dynamically in the notebook; no manual changes are needed.
-- ChromaDB and PDF folders are created automatically as the notebook runs.
+- All steps cen be are created automatically as the notebook runs.
 
 ---
 
