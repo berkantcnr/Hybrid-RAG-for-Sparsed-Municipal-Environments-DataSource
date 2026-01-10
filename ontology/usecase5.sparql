@@ -1,0 +1,64 @@
+PREFIX crm: <http://erlangen-crm.org/240307/>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX base: <http://www.semanticweb.org/berka/ontologies/2025/10/untitled-ontology-3#>
+
+SELECT ?groupName ?entityName ?category 
+       (SAMPLE(?rawTypeLabel) AS ?typeLabel) 
+       ?restrictionStatus 
+       (SAMPLE(?rawNote) AS ?description)
+WHERE {
+  {
+    # BLOCK 1: DEVICES (Specific 3D Printers)
+    ?entity a crm:E22_Human-Made_Object ;
+            crm:P2_has_type ?productModel .
+    ?productModel a crm:E99_Product_Type ;
+                  crm:P2_has_type ?typeVal .
+    # FILTER: Device Type for "3D Printer"
+    BIND(STRAFTER(STR(?typeVal), "#") AS ?typeNameString)
+    FILTER (regex(?typeNameString, "3d|printer|additive", "i"))
+    # Find Owner
+    ?group a crm:E74_Group ;
+           crm:P52i_is_current_owner_of ?entity .
+    # Get Device Description (if available)
+    OPTIONAL { ?entity crm:P3_has_note ?note . }
+    # Check Restrictions (Device -> Space)
+    OPTIONAL { ?entity crm:P104_is_subject_to ?deviceRight . }
+    OPTIONAL { 
+         ?group crm:P52i_is_current_owner_of ?parentSpace .
+         ?parentSpace a crm:E25_Human-Made_Feature ;
+                      crm:P104_is_subject_to ?spaceRight .
+    }
+    BIND(COALESCE(?deviceRight, ?spaceRight) AS ?right)
+    BIND(?note AS ?rawNote)
+    BIND("Device" AS ?category)
+  }
+  UNION
+  {
+    # BLOCK 2: SPACES 
+    # Finds spaces that mention "3D Printing" even if no device is listed
+    ?entity a crm:E25_Human-Made_Feature .
+    ?group a crm:E74_Group ;
+           crm:P52i_is_current_owner_of ?entity .
+   OPTIONAL { ?entity crm:P3_has_note ?note . }
+    OPTIONAL { ?entity crm:P2_has_type ?typeVal . } 
+    # FILTER: Check Space Type OR Description
+    FILTER (
+      regex(LCASE(STR(?typeVal)), "3d|printer|additive", "i") || 
+      regex(LCASE(STR(?note)), "3d|printer|additive", "i")
+    )
+    # Check Restrictions
+    OPTIONAL { ?entity crm:P104_is_subject_to ?right . }
+    BIND(?note AS ?rawNote)
+    BIND("Space" AS ?category)
+  }
+  # FORMATTING
+  BIND(STRAFTER(STR(?group), "#") AS ?groupName)
+  BIND(STRAFTER(STR(?entity), "#") AS ?entityName)
+  BIND(STRAFTER(STR(?typeVal), "#") AS ?rawTypeLabel)
+  BIND(
+    IF(BOUND(?right), STRAFTER(STR(?right), "#"), "Public / Open Access") 
+    AS ?restrictionStatus
+  )
+}
+GROUP BY ?groupName ?entityName ?category ?restrictionStatus
+ORDER BY ?groupName

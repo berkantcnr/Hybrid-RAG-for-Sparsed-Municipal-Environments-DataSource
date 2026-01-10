@@ -1,0 +1,26 @@
+
+PREFIX crm: <http://erlangen-crm.org/240307/>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX base: <http://www.semanticweb.org/berka/ontologies/2025/10/untitled-ontology-3#>
+
+SELECT ?groupName ?spaceName ?categoryLabel ?description 
+WHERE {
+  ?space a crm:E25_Human-Made_Feature .
+  ?group a crm:E74_Group ;
+         crm:P52i_is_current_owner_of ?space .
+  # 2. Get the text properties (Note and Type)
+  OPTIONAL { ?space crm:P3_has_note ?note . }
+  OPTIONAL { ?space crm:P2_has_type ?type . }
+  # 3. SPARSE DATA FILTER 
+  # This simulates finding a match without knowing about any E22_Human-Made_Objects inside.
+  FILTER (
+    regex(LCASE(STR(?type)), "repair|maintenance|fix|restore", "i") || 
+    regex(LCASE(STR(?note)), "repair|maintenance|fix|restore", "i")
+  )
+  # 4. Formatting for readability
+  BIND(STRAFTER(STR(?group), "#") AS ?groupName)
+  BIND(STRAFTER(STR(?space), "#") AS ?spaceName)
+  BIND(STRAFTER(STR(?type), "#") AS ?categoryLabel)
+  BIND(STR(?note) AS ?description)
+}
+ORDER BY ?groupName

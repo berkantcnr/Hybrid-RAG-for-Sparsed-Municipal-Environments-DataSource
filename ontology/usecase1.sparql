@@ -1,0 +1,61 @@
+PREFIX crm: <http://erlangen-crm.org/240307/>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX base: <http://www.semanticweb.org/berka/ontologies/2025/10/untitled-ontology-3#>
+SELECT ?groupName ?entityName ?category (SAMPLE(?rawTypeLabel) AS ?typeLabel) ?restrictionStatus (SAMPLE(?rawNote) AS ?description)
+WHERE {
+  {
+    # BLOCK 1: E25 SPACES
+    ?entity a crm:E25_Human-Made_Feature .
+    ?group a crm:E74_Group ;
+           crm:P52i_is_current_owner_of ?entity .
+
+    OPTIONAL { ?entity crm:P3_has_note ?rawNote . }
+    OPTIONAL { ?entity crm:P2_has_type ?type . }
+
+    # Filter: Must match wood or fabrication
+    FILTER (
+      regex(LCASE(STR(?type)), "wood|fabrication", "i") || 
+      regex(LCASE(STR(?rawNote)), "wood|fabrication", "i")
+    )
+
+    # Restriction Check
+    OPTIONAL { ?entity crm:P104_is_subject_to ?right . }
+    BIND(?type AS ?typeVal)
+    BIND("Space" AS ?category)
+  }
+  UNION
+  {
+    # BLOCK 2: E22 DEVICES
+    ?entity a crm:E22_Human-Made_Object ;
+            crm:P2_has_type ?productModel .
+
+    ?productModel a crm:E99_Product_Type ;
+                  crm:P2_has_type ?typeVal . 
+    #Filter: Only Woodworking Tools
+    ?typeVal a crm:E55_Type ;
+             crm:P127_has_broader_term base:Woodworking_Tool .
+    ?group a crm:E74_Group ;
+           crm:P52i_is_current_owner_of ?entity .
+    OPTIONAL { ?entity crm:P3_has_note ?rawNote . }
+    # Cascading Restriction Check (Device -> Space)
+    OPTIONAL { ?entity crm:P104_is_subject_to ?deviceRight . }
+    OPTIONAL { 
+         ?group crm:P52i_is_current_owner_of ?parentSpace .
+         ?parentSpace a crm:E25_Human-Made_Feature ;
+                      crm:P104_is_subject_to ?spaceRight .
+    }
+    BIND(COALESCE(?deviceRight, ?spaceRight) AS ?right)
+    BIND("Device" AS ?category)
+  }
+  # FORMATTING
+  BIND(STRAFTER(STR(?group), "#") AS ?groupName)
+  BIND(STRAFTER(STR(?entity), "#") AS ?entityName)
+  BIND(STRAFTER(STR(?typeVal), "#") AS ?rawTypeLabel)
+  # Restriction
+  BIND(
+    IF(BOUND(?right), STRAFTER(STR(?right), "#"), "Public / Open Access") 
+    AS ?restrictionStatus
+  )
+}
+GROUP BY ?groupName ?entityName ?category ?restrictionStatus
+ORDER BY ?groupName

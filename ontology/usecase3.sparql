@@ -1,0 +1,38 @@
+PREFIX crm: <http://erlangen-crm.org/240307/>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX base: <http://www.semanticweb.org/berka/ontologies/2025/10/untitled-ontology-3#>
+
+
+   SELECT ?groupName ?spaceName 
+       (SAMPLE(?rawTypeLabel) AS ?typeLabel) 
+       (SAMPLE(?rawNote) AS ?description) 
+       (SAMPLE(?rawLocation) AS ?locationName) 
+       ?restrictionStatus
+WHERE {
+  # 1. Find the Space and Location
+  ?e25 a crm:E25_Human-Made_Feature ;
+       crm:P55_has_current_location ?location .
+  # 2. Find the Owner
+  ?group a crm:E74_Group ;
+         crm:P52i_is_current_owner_of ?e25 .
+  # 3. Get the Type (And Filter Immediately)
+  ?e25 crm:P2_has_type ?type .
+  # Filter: Only Audio, Video, or Media types
+  FILTER (regex(STR(?type), "Audio|Video|Media", "i"))
+  # 4. Get the Description for space e25
+  OPTIONAL { ?e25 crm:P3_has_note ?rawNote . }
+  # 5. Check Restriction
+  OPTIONAL { ?e25 crm:P104_is_subject_to ?right . }
+  # 6. String Cleaning
+  BIND(STRAFTER(STR(?group), "#") AS ?groupName)
+  BIND(STRAFTER(STR(?e25), "#") AS ?spaceName)
+  BIND(STRAFTER(STR(?type), "#") AS ?rawTypeLabel)
+  BIND(STRAFTER(STR(?location), "#") AS ?rawLocation)
+  # Restriction Status
+  BIND(
+    IF(BOUND(?right), STRAFTER(STR(?right), "#"), "Public / Open Access") 
+    AS ?restrictionStatus
+  )
+}
+GROUP BY ?groupName ?spaceName ?restrictionStatus
+ORDER BY ?groupName
